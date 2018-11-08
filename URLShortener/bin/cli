@@ -1,25 +1,52 @@
 #!/usr/bin/env ruby
 require 'launchy'
+class Cli
+  attr_accessor :user
 
-puts "What is your email?"
-email = gets.chomp
+  def create_or_visit
+    puts "Would you like visit or create a URL"
+    puts "Answer with 'create' or 'visit'"
+    answer = gets.chomp
 
-user = User.find_by(email: email)
+    if answer == "create"
+      puts "What URL would you like to shorten?"
+      url = gets.chomp
+      ShortenedUrl.create_with_user(@user, url)
+      shortened_url = ShortenedUrl.last
+      puts "Your URL has been created!"
+      Visit.record_visit!(@user, shortened_url)
+      Launchy.open url
+    elsif answer == "visit"
+      puts "Not yet implemented."
+    else
+      puts "Invalid input."
+    end
+  end
+  
+  def run
+    puts "What is your email?"
+    email = gets.chomp
 
-puts "Would you like visit or create a URL"
-puts "Answer with 'create' or 'visit'"
-answer = gets.chomp
-
-if answer == "create"
-  puts "What URL would you like to shorten?"
-  url = gets.chomp
-  ShortenedUrl.create_with_user(user, url)
-  shortened_url = ShortenedUrl.last
-  puts "Your URL has been created!"
-  Visit.record_visit!(user, shortened_url)
-  Launchy.open url
-elsif answer == "visit"
-  puts "Not yet implemented."
-else
-  puts "Invalid input."
+    @user = User.find_by(email: email)
+    
+    if user
+      create_or_visit
+    else
+      puts "Would you like to create an account?"
+      puts "Please enter Y or N"
+      answer = gets.chomp
+      
+      if answer == "Y"
+        user = User.new(email: email)
+        user.save
+        @user = User.last
+        puts "Your account has been created!"
+        create_or_visit
+      else
+        puts "We didn't want you in our app anyways... :("
+      end
+    end
+  end
 end
+
+Cli.new.run
