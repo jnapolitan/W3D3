@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+puts "What is your email?"
+email = gets.chomp
+
+user = User.find_by(email: email)
+p user
+
+puts "Would you like visit or create a URL"
+puts "Answer with 'create' or 'visit'"
+answer = gets.chomp
+
+if answer == "create"
+  puts "What URL would you like to shorten?"
+  url = gets.chomp
+    ShortenedUrl.create_with_user(user, url)
+    puts "Your URL has been created!"
+elsif answer == "visit"
+  puts "Not yet implemented."
+else
+  puts "Invalid input."
+end
