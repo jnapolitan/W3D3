@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'launchy'
 
 puts "What is your email?"
 email = gets.chomp
@@ -15,6 +16,7 @@ if answer == "create"
   url = gets.chomp
     ShortenedUrl.create_with_user(user, url)
     puts "Your URL has been created!"
+    Launchy.open url
 elsif answer == "visit"
   puts "Not yet implemented."
 else
